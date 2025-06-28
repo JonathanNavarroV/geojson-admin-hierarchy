@@ -4,6 +4,7 @@ import json
 from utils.encoding import fix_encoding
 from utils.geo_operations import find_parent
 from utils.builder import build_structure
+from utils.assign_missing import assign_missing_provinces, assign_missing_districts
 
 # Rutas
 ADM1_PATH = "data/chile/geoBoundaries-CHL-ADM1_simplified.geojson"
@@ -40,6 +41,12 @@ missing_provinces = adm3[adm3['province_index'].isnull()]
 print(f"Comunidades sin provincia: {len(missing_provinces)}")
 for idx, row in missing_provinces.iterrows():
     print(f"  - ID: {idx}, Nombre: {fix_encoding(row.get('shapeName', ''))}")
+
+if not missing_regions.empty:
+    assign_missing_provinces(adm2, adm1)
+
+if not missing_provinces.empty:
+    assign_missing_districts(adm3, adm2)
 
 # Se construye la estructura
 country_structure = build_structure(adm1, adm2, adm3)
