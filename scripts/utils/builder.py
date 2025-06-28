@@ -1,7 +1,7 @@
 from utils.encoding import fix_encoding
 
 
-def build_structure(adm1, adm2, adm3=None):
+def build_structure(adm1, adm2, adm3=None, country_name=""):
     """
     Construye la estructura anidada de adm1 -> adm2 -> adm3 si existe.
 
@@ -56,7 +56,7 @@ def build_structure(adm1, adm2, adm3=None):
 
     return {
         "country": {
-            "name": "Chile",
+            "name": country_name,
             "adm1": adm1_list
         }
     }

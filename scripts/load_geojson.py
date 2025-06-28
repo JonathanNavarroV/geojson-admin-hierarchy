@@ -59,10 +59,10 @@ if adm3 is not None and not missing_adm2.empty:
     assign_missing_adm3(adm3, adm2, adm1)
 
 # Construir estructura anidada (ADM1 -> ADM2 -> ADM3)
-country_structure = build_structure(adm1, adm2, adm3)
+country_name = os.path.basename(data_folder)
+country_structure = build_structure(adm1, adm2, adm3, country_name=country_name)
 
 # Guardar archivo utilizando el nombre de la carpeta seleccionada
-country_name = os.path.basename(data_folder)
 output_filename = f"{country_name}_administrative_structure_nested.json"
 output_path = os.path.join("output", output_filename)
 with open(output_path, "w", encoding="utf-8") as f:
