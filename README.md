@@ -88,31 +88,31 @@ El script genera un archivo `.json` con una estructura jerárquica basada en los
 
 ```json
 {
-	"country": {
-		"name": "chile",
-		"adm1": [
-			{
-				"id": "0",
-				"name": "Región Metropolitana",
-				"adm2": [
-					{
-						"id": "12",
-						"name": "Provincia de Santiago",
-						"adm3": [
-							{
-								"id": "101",
-								"name": "Comuna de Ñuñoa"
-							},
-							{
-								"id": "102",
-								"name": "Comuna de Providencia"
-							}
-						]
-					}
-				]
-			}
-		]
-	}
+  "country": {
+    "name": "chile",
+    "adm1": [
+      {
+        "id": "0",
+        "name": "Región Metropolitana",
+        "adm2": [
+          {
+            "id": "12",
+            "name": "Provincia de Santiago",
+            "adm3": [
+              {
+                "id": "101",
+                "name": "Comuna de Ñuñoa"
+              },
+              {
+                "id": "102",
+                "name": "Comuna de Providencia"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
 }
 ```
 
@@ -120,21 +120,21 @@ El script genera un archivo `.json` con una estructura jerárquica basada en los
 
 ```json
 {
-	"country": {
-		"name": "argentina",
-		"adm1": [
-			{
-				"id": "0",
-				"name": "Buenos Aires",
-				"adm2": [
-					{
-						"id": "15",
-						"name": "Partido de La Matanza"
-					}
-				]
-			}
-		]
-	}
+  "country": {
+    "name": "argentina",
+    "adm1": [
+      {
+        "id": "0",
+        "name": "Buenos Aires",
+        "adm2": [
+          {
+            "id": "15",
+            "name": "Partido de La Matanza"
+          }
+        ]
+      }
+    ]
+  }
 }
 ```
 
