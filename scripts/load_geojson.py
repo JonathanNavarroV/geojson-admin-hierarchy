@@ -51,6 +51,22 @@ adm1 = gpd.read_file(ADM1_PATH)
 adm2 = gpd.read_file(ADM2_PATH)
 adm3 = gpd.read_file(ADM3_PATH)
 
+# Se convierte a CRS proyectado (EPSG:3857) para calcular correctamente los centroides en metros
+adm1 = adm1.to_crs(epsg=3857)
+adm2 = adm2.to_crs(epsg=3857)
+adm3 = adm3.to_crs(epsg=3857)
+
+# Se calcular el centroide de cada geometría
+adm1['centroid'] = adm1.geometry.centroid
+adm2['centroid'] = adm2.geometry.centroid
+adm3['centroid'] = adm3.geometry.centroid
+
+# Se asigna provincia a cada comuna
+adm3['province_index'] = find_parent(adm3, adm2)
+
+# Se asigna región a cada provincia
+adm2['region_index'] = find_parent(adm2, adm1)
+
 # Ejemplo
 print("Ejemplo de regiones (ADM1):")
 print(adm1[['shapeName']].head())
