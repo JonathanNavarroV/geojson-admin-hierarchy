@@ -4,12 +4,12 @@ import json
 from utils.encoding import fix_encoding
 from utils.geo_operations import find_parent
 from utils.builder import build_structure
-from utils.assign_missing import assign_missing_provinces, assign_missing_districts
+from utils.assign_missing import assign_missing_adm2, assign_missing_adm3
 
 # Rutas
-ADM1_PATH = "data/chile/geoBoundaries-CHL-ADM1_simplified.geojson"
-ADM2_PATH = "data/chile/geoBoundaries-CHL-ADM2_simplified.geojson"
-ADM3_PATH = "data/chile/geoBoundaries-CHL-ADM3_simplified.geojson"
+ADM1_PATH = "data/argentina/geoBoundaries-ARG-ADM1_simplified.geojson"
+ADM2_PATH = "data/argentina/geoBoundaries-ARG-ADM2_simplified.geojson"
+ADM3_PATH = ""
 
 # Cargar archivos
 adm1 = gpd.read_file(ADM1_PATH)
@@ -21,34 +21,35 @@ adm1 = adm1.to_crs(epsg=3857)
 adm2 = adm2.to_crs(epsg=3857)
 adm3 = adm3.to_crs(epsg=3857)
 
-# Se calcular el centroide de cada geometría
+# Se calculan los centroides de cada geometría
 adm1['centroid'] = adm1.geometry.centroid
 adm2['centroid'] = adm2.geometry.centroid
 adm3['centroid'] = adm3.geometry.centroid
 
-# Se asignan las relaciones
-adm3['province_index'] = find_parent(adm3, adm2)
-adm2['region_index'] = find_parent(adm2, adm1)
+# Se asignan las relaciones jerárquicas
+adm3['adm2_index'] = find_parent(adm3, adm2)  # adm3 → adm2
+adm2['adm1_index'] = find_parent(adm2, adm1)  # adm2 → adm1
 
-# Provincias sin región asignada
-missing_regions = adm2[adm2['region_index'].isnull()]
-print(f"Provincias sin región: {len(missing_regions)}")
-for idx, row in missing_regions.iterrows():
+# ADM2 sin ADM1 asignado
+missing_adm1 = adm2[adm2['adm1_index'].isnull()]
+print(f"ADM2 sin ADM1 asignado: {len(missing_adm1)}")
+for idx, row in missing_adm1.iterrows():
     print(f"  - ID: {idx}, Nombre: {fix_encoding(row.get('shapeName', ''))}")
 
-# Comunas sin provincia asignada
-missing_provinces = adm3[adm3['province_index'].isnull()]
-print(f"Comunidades sin provincia: {len(missing_provinces)}")
-for idx, row in missing_provinces.iterrows():
+# ADM3 sin ADM2 asignado
+missing_adm2 = adm3[adm3['adm2_index'].isnull()]
+print(f"ADM3 sin ADM2 asignado: {len(missing_adm2)}")
+for idx, row in missing_adm2.iterrows():
     print(f"  - ID: {idx}, Nombre: {fix_encoding(row.get('shapeName', ''))}")
 
-if not missing_regions.empty:
-    assign_missing_provinces(adm2, adm1)
+# Reasignar si es necesario
+if not missing_adm1.empty:
+    assign_missing_adm2(adm2, adm1)
 
-if not missing_provinces.empty:
-    assign_missing_districts(adm3, adm2, adm1)
+if not missing_adm2.empty:
+    assign_missing_adm3(adm3, adm2, adm1)
 
-# Se construye la estructura
+# Construir estructura final
 country_structure = build_structure(adm1, adm2, adm3)
 
 # Guardar archivo

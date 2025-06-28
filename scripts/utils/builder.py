@@ -3,66 +3,60 @@ from utils.encoding import fix_encoding
 
 def build_structure(adm1, adm2, adm3):
     """
-    Construye la estructura anidada de regions, provinces y districts desde tres GeoDataFrames.
-    Tanto provinces como districts se almacenan como listas para mantener consistencia.
+    Construye la estructura anidada de adm1 -> adm2 -> adm3 desde tres GeoDataFrames.
+    Tanto adm2 como adm3 se almacenan como listas para mantener consistencia.
 
     Args:
-        adm1 (GeoDataFrame): Niveles ADM1 (Regiones)
-        adm2 (GeoDataFrame): Niveles ADM2 (Provincias)
-        adm3 (GeoDataFrame): Niveles ADM3 (Comunas o distritos)
+        adm1 (GeoDataFrame): Niveles ADM1 (ej. regiones, estados)
+        adm2 (GeoDataFrame): Niveles ADM2 (ej. provincias, departamentos)
+        adm3 (GeoDataFrame): Niveles ADM3 (ej. comunas, distritos)
 
     Returns:
-        dict: Estructura anidada por pacountry -> regions -> provinces -> districts
+        dict: Estructura anidada por país -> adm1 -> adm2 -> adm3
     """
 
-    # Se construye diccionario para la anidación
-    regions = []
+    adm1_list = []
 
-    # Recorrer cada region en el GeoDataFrame de regions (adm1)
-    for idx_reg, region in adm1.iterrows():
-        # Convertir el índice a string
-        region_id = str(int(idx_reg))
-        region_name = fix_encoding(region.get('shapeName', ''))
+    for idx_adm1, row_adm1 in adm1.iterrows():
+        adm1_id = str(int(idx_adm1))
+        adm1_name = fix_encoding(row_adm1.get("shapeName", ""))
 
-        # Provincias asociadas a esta región
-        provinces_in_region = adm2[adm2["region_index"] == idx_reg]
+        # Filtrar adm2 pertenecientes a este adm1
+        adm2_in_adm1 = adm2[adm2["adm1_index"] == idx_adm1]
 
-        province_list = []
-        for idx_prov, province in provinces_in_region.iterrows():
-            province_id = str(int(idx_prov))
-            province_name = fix_encoding(province.get("shapeName", ""))
+        adm2_list = []
+        for idx_adm2, row_adm2 in adm2_in_adm1.iterrows():
+            adm2_id = str(int(idx_adm2))
+            adm2_name = fix_encoding(row_adm2.get("shapeName", ""))
 
-            # Comunas asociadas a esta provincia
-            districts_in_province = adm3[adm3["province_index"] == idx_prov]
+            # Filtrar adm3 pertenecientes a este adm2
+            adm3_in_adm2 = adm3[adm3["adm2_index"] == idx_adm2]
 
-            district_list = []
-            for idx_dist, district in districts_in_province.iterrows():
-                district_id = str(int(idx_dist))
-                district_name = fix_encoding(district.get("shapeName", ""))
+            adm3_list = []
+            for idx_adm3, row_adm3 in adm3_in_adm2.iterrows():
+                adm3_id = str(int(idx_adm3))
+                adm3_name = fix_encoding(row_adm3.get("shapeName", ""))
 
-                district_list.append({
-                    "id": district_id,
-                    "name": district_name
+                adm3_list.append({
+                    "id": adm3_id,
+                    "name": adm3_name
                 })
 
-            # Agregar provincia con sus comunas
-            province_list.append({
-                "id": province_id,
-                "name": province_name,
-                "districts": district_list
+            adm2_list.append({
+                "id": adm2_id,
+                "name": adm2_name,
+                "adm3": adm3_list
             })
 
-        # Agregar región con sus provincias
-        regions.append({
-            "id": region_id,
-            "name": region_name,
-            "provinces": province_list
+        adm1_list.append({
+            "id": adm1_id,
+            "name": adm1_name,
+            "adm2": adm2_list
         })
 
-    # Retornar estructura final
     return {
         "country": {
             "name": "Chile",
-            "regions": regions
+            "adm1": adm1_list
         }
     }
