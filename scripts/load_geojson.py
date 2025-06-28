@@ -46,7 +46,7 @@ if not missing_regions.empty:
     assign_missing_provinces(adm2, adm1)
 
 if not missing_provinces.empty:
-    assign_missing_districts(adm3, adm2)
+    assign_missing_districts(adm3, adm2, adm1)
 
 # Se construye la estructura
 country_structure = build_structure(adm1, adm2, adm3)
