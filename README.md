@@ -1,4 +1,4 @@
-# Administrative Boundaries Processor 🌍🗺️
+# Procesador de límites administrativos 🌍🗺️
 
 Script en Python para procesar archivos GeoJSON de divisiones administrativas (regiones, provincias, comunas o equivalentes) de cualquier país, generando una estructura JSON jerárquica y corregida para uso en análisis o aplicaciones GIS.
 

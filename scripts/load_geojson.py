@@ -69,6 +69,18 @@ adm3['province_index'] = find_parent(adm3, adm2)
 # Se asigna región a cada provincia
 adm2['region_index'] = find_parent(adm2, adm1)
 
+# Provincias sin región asignada
+missing_regions = adm2[adm2['region_index'].isnull()]
+print(f"Provincias sin región: {len(missing_regions)}")
+for idx, row in missing_regions.iterrows():
+    print(f"  - ID: {idx}, Nombre: {fix_encoding(row.get('shapeName', ''))}")
+
+# Comunas sin provincia asignada
+missing_provinces = adm3[adm3['province_index'].isnull()]
+print(f"Comunidades sin provincia: {len(missing_provinces)}")
+for idx, row in missing_provinces.iterrows():
+    print(f"  - ID: {idx}, Nombre: {fix_encoding(row.get('shapeName', ''))}")
+
 # Se construye diccionario para la anidación
 regions_dict = {}
 
