@@ -7,8 +7,8 @@ Script en Python para procesar archivos GeoJSON de divisiones administrativas (A
 ## 👨‍💻 Tecnologías
 
 - Python 3
-- GeoPandas
-- Shapely
+- [GeoPandas](https://geopandas.org/en/v1.1.1/)
+- [Shapely](https://shapely.readthedocs.io/en/2.1.1/)
 - JSON
 - Proyección y cálculo espacial (CRS EPSG:4326 / EPSG:3857)
 
@@ -16,14 +16,19 @@ Script en Python para procesar archivos GeoJSON de divisiones administrativas (A
 
 ## ✅ Funcionalidades implementadas
 
-- Carga de múltiples archivos GeoJSON de niveles administrativos (ADM1, ADM2, ADM3).
-- Soporte para países con dos o tres niveles administrativos (ADM3 es opcional).
-- Cálculo de centroides para relacionar jerarquías territoriales (padres-hijos).
-- Corrección automática de encoding para nombres con caracteres especiales.
+- Carga automática de archivos GeoJSON desde la carpeta data/.
+- Soporte para países con 2 o 3 niveles administrativos (ADM3 es opcional).
+- Detección automática de archivos geoBoundaries-COUNTRY-ADMx_simplified.geojson.
+- Cálculo de centroides para establecer relaciones jerárquicas (padre → hijo).
+- Corrección automática de caracteres mal codificados (tildes, eñes, etc.).
 - Generación de un JSON anidado con la estructura:
-  country → adm1 → adm2 → adm3 (opcional).
-- Identificación y reporte de datos sin asignar (por ejemplo, ADM2 sin ADM1, ADM3 sin ADM2).
-- Asignación manual interactiva para corregir jerarquías faltantes.
+
+```scss
+country → adm1 → adm2 → adm3 (si aplica)
+```
+
+- Detección de unidades administrativas huérfanas (ADM2 sin ADM1, ADM3 sin ADM2).
+- Asignación manual e interactiva desde la consola para corregir estos casos.
 
 ---
 
@@ -44,11 +49,16 @@ pip install -r requirements.txt
 
 ### 3. Coloca tus archivos GeoJSON
 
-Agrega los archivos GeoJSON simplificados con los niveles administrativos (ej.
-`geoBoundaries-COUNTRY-ADM1_simplified.geojson`,
-`geoBoundaries-COUNTRY-ADM2_simplified.geojson`,
-`geoBoundaries-COUNTRY-ADM3_simplified.geojson` — este último es opcional)
-en la carpeta `data/COUNTRY`.
+Copia los archivos `geoBoundaries-...` en una subcarpeta dentro de `data/`, por ejemplo:
+
+```bash
+data/chile/
+  ├─ geoBoundaries-CHL-ADM1_simplified.geojson
+  ├─ geoBoundaries-CHL-ADM2_simplified.geojson
+  ├─ geoBoundaries-CHL-ADM3_simplified.geojson (opcional)
+```
+
+> 📁 El nombre de la carpeta será usado como el nombre del país en la estructura JSON final.
 
 ### 4. Ejecuta el script
 
@@ -56,11 +66,81 @@ en la carpeta `data/COUNTRY`.
 python .\scripts\load_geojson.py
 ```
 
-Durante la ejecución, si se detectan niveles administrativos sin asignación padre (por ejemplo, ADM2 sin ADM1 o ADM3 sin ADM2), se activará un modo interactivo para asignar manualmente las relaciones faltantes a través de un menú desplegable.
+Durante la ejecución, se te pedirá seleccionar interactivamente el país (carpeta en data/) y se detectarán automáticamente los archivos correspondientes a ADM1, ADM2 y ADM3.
+
+- Si existen divisiones administrativas sin jerarquía asignada, se activará una interfaz interactiva en consola para asignarlas manualmente.
 
 ### 5. Obtén el JSON resultante
 
-El archivo `country_administrative_structure_nested.json` se generará en la carpeta `output/` con la estructura jerárquica para uso directo.
+Se generará un archivo JSON jerárquico en la carpeta `output/`, por ejemplo:
+
+```bash
+output/chile_administrative_structure_nested.json
+```
+
+---
+
+## 📦 Estructura del JSON generado
+
+El script genera un archivo `.json` con una estructura jerárquica basada en los niveles administrativos del país seleccionado.
+
+### Ejemplo (con ADM3):
+
+```json
+{
+	"country": {
+		"name": "chile",
+		"adm1": [
+			{
+				"id": "0",
+				"name": "Región Metropolitana",
+				"adm2": [
+					{
+						"id": "12",
+						"name": "Provincia de Santiago",
+						"adm3": [
+							{
+								"id": "101",
+								"name": "Comuna de Ñuñoa"
+							},
+							{
+								"id": "102",
+								"name": "Comuna de Providencia"
+							}
+						]
+					}
+				]
+			}
+		]
+	}
+}
+```
+
+### Ejemplo (sin ADM3):
+
+```json
+{
+	"country": {
+		"name": "argentina",
+		"adm1": [
+			{
+				"id": "0",
+				"name": "Buenos Aires",
+				"adm2": [
+					{
+						"id": "15",
+						"name": "Partido de La Matanza"
+					}
+				]
+			}
+		]
+	}
+}
+```
+
+> 🔁 Los campos id corresponden al índice de cada unidad administrativa en el archivo original.
+>
+> ✍️ Los nombres son limpiados y corregidos automáticamente para evitar errores de codificación.
 
 ---
 
