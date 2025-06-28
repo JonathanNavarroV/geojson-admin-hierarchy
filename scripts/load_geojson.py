@@ -9,47 +9,53 @@ from utils.assign_missing import assign_missing_adm2, assign_missing_adm3
 # Rutas
 ADM1_PATH = "data/argentina/geoBoundaries-ARG-ADM1_simplified.geojson"
 ADM2_PATH = "data/argentina/geoBoundaries-ARG-ADM2_simplified.geojson"
-ADM3_PATH = ""
+ADM3_PATH = ""  # Puede estar vacío si no hay tercer nivel
 
 # Cargar archivos
 adm1 = gpd.read_file(ADM1_PATH)
 adm2 = gpd.read_file(ADM2_PATH)
-adm3 = gpd.read_file(ADM3_PATH)
+adm3 = None
+if ADM3_PATH:
+    adm3 = gpd.read_file(ADM3_PATH)
 
-# Se convierte a CRS proyectado (EPSG:3857) para calcular correctamente los centroides en metros
+# Convertir a CRS para cálculo de centroides
 adm1 = adm1.to_crs(epsg=3857)
 adm2 = adm2.to_crs(epsg=3857)
-adm3 = adm3.to_crs(epsg=3857)
+if adm3 is not None:
+    adm3 = adm3.to_crs(epsg=3857)
 
-# Se calculan los centroides de cada geometría
+# Calcular centroides
 adm1['centroid'] = adm1.geometry.centroid
 adm2['centroid'] = adm2.geometry.centroid
-adm3['centroid'] = adm3.geometry.centroid
+if adm3 is not None:
+    adm3['centroid'] = adm3.geometry.centroid
 
-# Se asignan las relaciones jerárquicas
-adm3['adm2_index'] = find_parent(adm3, adm2)  # adm3 → adm2
-adm2['adm1_index'] = find_parent(adm2, adm1)  # adm2 → adm1
+# Asignar relaciones
+if adm3 is not None:
+    adm3['adm2_index'] = find_parent(adm3, adm2)
+adm2['adm1_index'] = find_parent(adm2, adm1)
 
-# ADM2 sin ADM1 asignado
+# Mostrar elementos sin jerarquía asignada
 missing_adm1 = adm2[adm2['adm1_index'].isnull()]
 print(f"ADM2 sin ADM1 asignado: {len(missing_adm1)}")
 for idx, row in missing_adm1.iterrows():
     print(f"  - ID: {idx}, Nombre: {fix_encoding(row.get('shapeName', ''))}")
 
-# ADM3 sin ADM2 asignado
-missing_adm2 = adm3[adm3['adm2_index'].isnull()]
-print(f"ADM3 sin ADM2 asignado: {len(missing_adm2)}")
-for idx, row in missing_adm2.iterrows():
-    print(f"  - ID: {idx}, Nombre: {fix_encoding(row.get('shapeName', ''))}")
+if adm3 is not None:
+    missing_adm2 = adm3[adm3['adm2_index'].isnull()]
+    print(f"ADM3 sin ADM2 asignado: {len(missing_adm2)}")
+    for idx, row in missing_adm2.iterrows():
+        print(
+            f"  - ID: {idx}, Nombre: {fix_encoding(row.get('shapeName', ''))}")
 
-# Reasignar si es necesario
+# Asignación manual si es necesario
 if not missing_adm1.empty:
     assign_missing_adm2(adm2, adm1)
 
-if not missing_adm2.empty:
+if adm3 is not None and not missing_adm2.empty:
     assign_missing_adm3(adm3, adm2, adm1)
 
-# Construir estructura final
+# Construir estructura
 country_structure = build_structure(adm1, adm2, adm3)
 
 # Guardar archivo
