@@ -1,4 +1,4 @@
-from scripts.utils.encoding import fix_encoding
+from utils.encoding import fix_encoding
 
 
 def build_structure(adm1, adm2, adm3):

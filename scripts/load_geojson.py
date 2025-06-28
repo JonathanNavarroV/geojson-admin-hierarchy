@@ -1,10 +1,9 @@
 import geopandas as gpd
 import os
 import json
-from scripts.utils.encoding import fix_encoding
-from scripts.utils.geo_operations import find_parent
-from scripts.utils.builder import build_structure
-
+from utils.encoding import fix_encoding
+from utils.geo_operations import find_parent
+from utils.builder import build_structure
 
 # Rutas
 ADM1_PATH = "data/chile/geoBoundaries-CHL-ADM1_simplified.geojson"
