@@ -19,7 +19,7 @@ Script en Python para procesar archivos GeoJSON de divisiones administrativas (r
 - Carga de múltiples archivos GeoJSON de niveles administrativos.
 - Cálculo de centroides para relacionar jerarquías territoriales (padres-hijos).
 - Corrección automática de encoding para nombres con caracteres especiales.
-- Generación de un JSON anidado con la estructura país → regiones → provincias → comunas.
+- Generación de un JSON anidado con la estructura country → regions → provinces → districts.
 - Identificación y reporte de posibles datos sin asignar (comunas sin provincia, provincias sin región).
 
 ---
@@ -29,29 +29,29 @@ Script en Python para procesar archivos GeoJSON de divisiones administrativas (r
 ### 1. Clona el repositorio
 
 ```bash
-git clone https://github.com/TU_USUARIO/admin-boundaries-processor.git
-cd admin-boundaries-processor
+git clone git@github.com:JonathanNavarroV/geojson-admin-hierarchy.git
+cd geojson-admin-hierarchy
 ```
 
 ### 2. Instala las dependencias
 
 ```bash
-pip install geopandas shapely
+pip install -r requirements.txt
 ```
 
 ### 3. Coloca tus archivos GeoJSON
 
-Agrega los archivos GeoJSON simplificados con los niveles administrativos (ej. `geoBoundaries-COUNTRY-ADM1_simplified.geojson`, `geoBoundaries-COUNTRY-ADM2_simplified.geojson`, `geoBoundaries-COUNTRY-ADM3_simplified.geojson`) en la carpeta raíz.
+Agrega los archivos GeoJSON simplificados con los niveles administrativos (ej. `geoBoundaries-COUNTRY-ADM1_simplified.geojson`, `geoBoundaries-COUNTRY-ADM2_simplified.geojson`, `geoBoundaries-COUNTRY-ADM3_simplified.geojson`) en la carpeta `data/COUNTRY`.
 
 ### 4. Ejecuta el script
 
 ```bash
-python adm_cleaner.py
+python .\scripts\load_geojson.py
 ```
 
 ### 5. Obtén el JSON resultante
 
-El archivo `country_administrative_structure_nested.json` se generará con la estructura jerárquica para uso directo.
+El archivo `country_administrative_structure_nested.json` se generará en la carpeta `output/` con la estructura jerárquica para uso directo.
 
 ---
 

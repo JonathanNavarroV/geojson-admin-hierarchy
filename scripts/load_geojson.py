@@ -167,7 +167,7 @@ country_structure = {
 
 # Guardar archivo
 output_path = os.path.join(
-    "output", "test.json")
+    "output", "country_administrative_structure_nested.json")
 with open(output_path, "w", encoding="utf-8") as f:
     json.dump(country_structure, f, ensure_ascii=False, indent=2)
 
